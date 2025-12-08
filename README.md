@@ -1,4 +1,33 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# b2c-supply-chain-system
+
+This repository contains a demo blockchain-enabled B2C supply chain system built with Next.js, Hardhat, Viem/Ethers integration, and PostgreSQL client placeholders.
+
+Quick start
+
+1. Install dependencies:
+
+```powershell
+npm install
+```
+
+2. Compile contracts and run local dev server (Hardhat + Next):
+
+```powershell
+npx hardhat compile
+npm run dev
+```
+
+3. To deploy locally with Hardhat:
+
+```powershell
+npx hardhat run scripts/deploy.ts --network hardhat
+```
+
+Notes
+
+- Add your database and blockchain configuration in `hardhat.config.ts` and `.env` as needed.
+- The project uses `viem` in some scripts; the deploy script falls back to `hre.ethers` if Viem is not available.
+  This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
 
