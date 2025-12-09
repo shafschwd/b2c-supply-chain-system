@@ -125,3 +125,14 @@ export async function getUserByEmail(email: string): Promise<User | null> {
     return null;
   }
 }
+
+export async function getUserById(id: string): Promise<User | null> {
+  const text = `SELECT ${USER_FIELDS} FROM users WHERE id = $1`;
+  try {
+    const result: QueryResult = await query(text, [id]);
+    return result.rows.length > 0 ? (result.rows[0] as User) : null;
+  } catch (error) {
+    console.error('Database query error (getUserById):', error);
+    return null;
+  }
+}

@@ -35,7 +35,7 @@ import { getAddress } from 'viem';
 
 // --- CONFIGURATION ---
 // You MUST update this address after the initial deployment (see Step 2)
-const CONTRACT_ADDRESS: Address = getAddress('0x0b306bf915c4d645ff596e518faf3f9669b97016');
+const CONTRACT_ADDRESS: Address = getAddress('0x5fbdb2315678afecb367f032d93f642f64180aa3');
 const DEPLOYER_PRIVATE_KEY =
   '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'; // Hardhat default private key #0
 

@@ -27,7 +27,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       {/* 3. Preserve Font Variables and CSS Classes on the <body> tag */}
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}

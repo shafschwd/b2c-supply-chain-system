@@ -1,7 +1,7 @@
 // /app/api/wallet/route.ts (MODIFIED FILE)
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getUserByEmail } from '@/lib/db/users'; // For the GET request
+import { getUserById } from '@/lib/db/users'; // For the GET request
 import { updateWalletBalance } from '@/lib/db/wallet-management'; // NEW
 
 // === GET (Fetch Current User Balance) ===
@@ -17,10 +17,7 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // We can reuse getUserById (or update your getUserByEmail to accept ID)
-    // For now, let's assume a simplified GET for user details exists in users.ts or modify to use email if necessary.
-    // Assuming a simple getUserByEmail still works for lookup:
-    const user = await getUserByEmail(userId); // NOTE: Assuming userId is actually the email for a quick fix, or create getUserById
+    const user = await getUserById(userId);
 
     if (!user) {
       return NextResponse.json({ error: 'User not found.' }, { status: 404 });
