@@ -12,6 +12,10 @@ const config: HardhatUserConfig = {
       type: 'edr-simulated',
       chainId: 31337,
     },
+    sepolia: {
+      url: process.env.SEPOLIA_RPC_URL || 'https://rpc.sepolia.org',
+      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+    },
   },
 };
 
