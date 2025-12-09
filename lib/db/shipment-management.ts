@@ -14,7 +14,7 @@ const EVENT_STATUS_UPDATE = 1;
 export async function getActiveShipments(): Promise<Shipment[]> {
   console.log(`[DB] Fetching all active shipments`);
   try {
-    const result = await query('SELECT * FROM shipments');
+    const result = await query('SELECT * FROM shipments ORDER BY last_update DESC');
     return result.rows as Shipment[];
   } catch (error) {
     console.error('Database fetch error (getActiveShipments):', error);

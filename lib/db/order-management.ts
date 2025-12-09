@@ -21,11 +21,11 @@ export async function getOrdersAndShipments(
   console.log(`[DB] Fetching orders for role: ${user.role}`);
 
   // Base SQL queries (simplified for demo based on mock data structure)
-  let orderText = 'SELECT * FROM orders';
+  let orderText = 'SELECT * FROM orders ORDER BY order_timestamp DESC';
   const orderValues: string[] = [];
 
   if (user.role === UserRole.BUYER) {
-    orderText = 'SELECT * FROM orders WHERE buyer_id = $1';
+    orderText = 'SELECT * FROM orders WHERE buyer_id = $1 ORDER BY order_timestamp DESC';
     orderValues.push(user.id);
   }
   // Seller logic (assuming seller sees all orders for now, or you implement the JOIN later)
@@ -33,7 +33,7 @@ export async function getOrdersAndShipments(
   try {
     const orderResult = await query(orderText, orderValues);
     // Fetch all shipments, as the client handles filtering by order ID
-    const shipmentResult = await query('SELECT * FROM shipments');
+    const shipmentResult = await query('SELECT * FROM shipments ORDER BY last_update DESC');
 
     return {
       orders: orderResult.rows as Order[],
