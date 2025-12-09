@@ -130,13 +130,13 @@ export const OrderList: React.FC<OrderListProps> = ({ user, refreshUser }) => {
   ).length;
   const inProcessCount = orders.filter(
     (o) =>
-      o.current_status === OrderStatus.PROCESSING ||
+      o.current_status === OrderStatus.ACCEPTED ||
       o.current_status === OrderStatus.SHIPPED
   ).length;
   const deliveredCount = orders.filter(
     (o) =>
       o.current_status === OrderStatus.DELIVERED ||
-      o.current_status === OrderStatus.COMPLETED
+      o.current_status === OrderStatus.CONFIRMED
   ).length;
   // const paidCount = orders.filter(o => o.payment_collected).length; // Requires payment_collected field on Order
 
@@ -222,7 +222,7 @@ export const OrderList: React.FC<OrderListProps> = ({ user, refreshUser }) => {
                           : 'bg-yellow-50 text-yellow-700 border-yellow-200'
                       }`}
                     >
-                      {order.current_status}
+                      {order.current_status === OrderStatus.SHIPPED ? 'IN TRANSIT' : order.current_status}
                     </div>
                     {/* Assuming order has payment_collected field */}
                     {(order as any).payment_collected && (
@@ -273,7 +273,7 @@ export const OrderList: React.FC<OrderListProps> = ({ user, refreshUser }) => {
                       {order.current_status === OrderStatus.PENDING && (
                         <button
                           onClick={() =>
-                            updateStatus(order, OrderStatus.PROCESSING)
+                            updateStatus(order, OrderStatus.ACCEPTED)
                           }
                           disabled={!!processing}
                           className="flex items-center space-x-2 bg-slate-900 text-white px-4 py-2 rounded hover:bg-slate-800"
@@ -290,7 +290,7 @@ export const OrderList: React.FC<OrderListProps> = ({ user, refreshUser }) => {
                       {/* Requires order.payment_collected field */}
                       {/* We cast to any here to allow for the mock field */}
                       {(order.current_status === OrderStatus.DELIVERED ||
-                        order.current_status === OrderStatus.COMPLETED) &&
+                        order.current_status === OrderStatus.CONFIRMED) &&
                         !(order as any).payment_collected && (
                           <button
                             onClick={() => collectPayment(order)}

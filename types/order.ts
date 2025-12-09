@@ -3,11 +3,11 @@ import { UserRole } from './user'; // Assuming defined elsewhere
 
 export enum OrderStatus {
   PENDING = 'PENDING',
-  PROCESSING = 'PROCESSING',
+  ACCEPTED = 'ACCEPTED',
   SHIPPED = 'SHIPPED',
-  IN_TRANSIT = 'IN_TRANSIT',
+  // IN_TRANSIT is not in DB enum, mapping logical flow to SHIPPED or separating if needed, but keeping simple for now
   DELIVERED = 'DELIVERED',
-  COMPLETED = 'COMPLETED',
+  CONFIRMED = 'CONFIRMED',
   CANCELLED = 'CANCELLED',
 }
 
