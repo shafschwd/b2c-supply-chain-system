@@ -120,15 +120,22 @@ export async function recordEventOnChain(
   }
 }
 
+// Helper to safely fetch logs with a limited block range
+const BLOCK_RANGE_LIMIT = 3000n; // Fetch last ~10h of logs
+
 /**
  * @dev Fetches the latest OrderEvent logs. Replaces mockBlockchain.getLedger.
  */
 export async function getBlockchainLedger(): Promise<BlockchainRecord[]> {
   try {
+    const currentBlock = BigInt(await publicClient.getBlockNumber());
+    const fromBlock = currentBlock - BLOCK_RANGE_LIMIT > 0n ? currentBlock - BLOCK_RANGE_LIMIT : 0n;
+
     const logs = await publicClient.getLogs({
       address: CONTRACT_ADDRESS,
       event: ORDER_EVENT_ABI[0],
-      fromBlock: BigInt(0),
+      fromBlock: fromBlock,
+      toBlock: 'latest' 
     });
     console.log(`[BC] Raw logs found: ${logs.length}`);
 
