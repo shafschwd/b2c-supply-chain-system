@@ -50,10 +50,22 @@ export async function createOrderTransaction(
     payment_collected: false, // Add payment_collected property
   };
 
+  // --- FETCH LOGISTICS PROVIDER ---
+  // Select a random logistics provider to assign the shipment to
+  const logisticsResult = await query(
+    "SELECT id FROM users WHERE role = 'LOGISTICS' LIMIT 1"
+  );
+  
+  if (logisticsResult.rows.length === 0) {
+    throw new Error('No Logistics Provider available. Please create an account with the role "Logistics Provider".');
+  }
+  
+  const logisticsId = logisticsResult.rows[0].id;
+
   const newShipment: Shipment = {
     shipment_id: shipmentId,
     order_id: orderId,
-    logistics_id: 'u_3', // Assign to FastTrack Logistics (u_3)
+    logistics_id: logisticsId,
     current_location: 'Awaiting Seller Acceptance',
     last_update: currentTimestamp,
     estimated_arrival: 'Pending',

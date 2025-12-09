@@ -141,9 +141,7 @@ export const ShipmentManager: React.FC<ShipmentManagerProps> = ({ user }) => {
 
           // Find associated order to check status
           const order = orders.find((o) => o.order_id === shipment.order_id);
-          const isOrderPending =
-            order?.current_status === OrderStatus.PENDING ||
-            order?.current_status === OrderStatus.PROCESSING; // Ensure shipment only moves if processing
+          const isOrderPending = order?.current_status === OrderStatus.PENDING;
 
           return (
             <div

@@ -31,9 +31,11 @@ const ORDER_TRACKER_ABI_PLACEHOLDER = [
   },
 ] as const;
 
+import { getAddress } from 'viem';
+
 // --- CONFIGURATION ---
 // You MUST update this address after the initial deployment (see Step 2)
-const CONTRACT_ADDRESS: Address = '0x5FbDB2315678afec8c3562b921AA65B2eB42d14A';
+const CONTRACT_ADDRESS: Address = getAddress('0x5FbDB2315678afec8c3562b921AA65B2eB42d14A');
 const DEPLOYER_PRIVATE_KEY =
   '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'; // Hardhat default private key #0
 
@@ -118,8 +120,9 @@ export async function getBlockchainLedger(): Promise<BlockchainRecord[]> {
       event: ORDER_EVENT_ABI[0],
       fromBlock: BigInt(0),
     });
+    console.log(`[BC] Raw logs found: ${logs.length}`);
 
-    return logs.map((log): BlockchainRecord => {
+    const mappedLogs = logs.map((log): BlockchainRecord => {
       const decoded = decodeEventLog({
         abi: ORDER_EVENT_ABI,
         data: log.data,
@@ -141,8 +144,11 @@ export async function getBlockchainLedger(): Promise<BlockchainRecord[]> {
         sender_address: decoded.args.sender,
       };
     });
+    
+    console.log(`[BC] Fetched ${mappedLogs.length} logs.`);
+    return mappedLogs;
   } catch (error) {
-    console.error('Error fetching blockchain ledger:', error);
+    console.error('[BC] Error fetching blockchain ledger:', error);
     return [];
   }
 }
