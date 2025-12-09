@@ -39,12 +39,20 @@ const CONTRACT_ADDRESS: Address = getAddress((process.env.NEXT_PUBLIC_CONTRACT_A
 
 // Helper to ensure private key has 0x prefix
 const formatPrivateKey = (key: string | undefined): Hex => {
-  if (!key) return '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80';
+  if (!key) {
+    console.warn("⚠️ WARNING: No PRIVATE_KEY found in env. using default Hardhat key (0xac09...). This will fail on Sepolia!");
+    return '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80';
+  }
+  console.log("✅ PRIVATE_KEY loaded from env.");
   if (key.startsWith('0x')) return key as Hex;
   return `0x${key}` as Hex;
 };
 
-const DEPLOYER_PRIVATE_KEY = formatPrivateKey(process.env.PRIVATE_KEY);
+// Forces use of Hardhat default key (Account #0) when running locally, regardless of env file.
+const isSepolia = process.env.NEXT_PUBLIC_BLOCKCHAIN_NETWORK === 'sepolia';
+const DEPLOYER_PRIVATE_KEY = isSepolia 
+  ? formatPrivateKey(process.env.PRIVATE_KEY) 
+  : '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80';
 
 // Determine Chain
 const CURRENT_CHAIN = process.env.NEXT_PUBLIC_BLOCKCHAIN_NETWORK === 'sepolia' ? sepolia : hardhat;
@@ -55,14 +63,14 @@ const account = privateKeyToAccount(DEPLOYER_PRIVATE_KEY);
 // Public Client (for reading/fetching events)
 const publicClient: PublicClient = createPublicClient({
   chain: CURRENT_CHAIN,
-  transport: http(process.env.SEPOLIA_RPC_URL), 
+  transport: http(process.env.NEXT_PUBLIC_BLOCKCHAIN_NETWORK === 'sepolia' ? process.env.SEPOLIA_RPC_URL : 'http://127.0.0.1:8545'), 
 });
 
 // Wallet Client (for writing/sending transactions)
 const walletClient: WalletClient = createWalletClient({
   account,
   chain: CURRENT_CHAIN,
-  transport: http(process.env.SEPOLIA_RPC_URL),
+  transport: http(process.env.NEXT_PUBLIC_BLOCKCHAIN_NETWORK === 'sepolia' ? process.env.SEPOLIA_RPC_URL : 'http://127.0.0.1:8545'),
 });
 
 // The ABI for the OrderEvent (must match the event in OrderTracker.sol)
@@ -102,7 +110,7 @@ export async function recordEventOnChain(
     // Send the transaction via the wallet client (signing it with the deployer account)
     const hash = await walletClient.sendTransaction({
       account,
-      chain: hardhat,
+      chain: CURRENT_CHAIN,
       to: CONTRACT_ADDRESS,
       data: data,
     });
@@ -121,7 +129,7 @@ export async function recordEventOnChain(
 }
 
 // Helper to safely fetch logs with a limited block range
-const BLOCK_RANGE_LIMIT = 3000n; // Fetch last ~10h of logs
+const BLOCK_RANGE_LIMIT = 9n; // Alchemy Free Tier: Max 10 blocks inclusive
 
 /**
  * @dev Fetches the latest OrderEvent logs. Replaces mockBlockchain.getLedger.
@@ -135,7 +143,7 @@ export async function getBlockchainLedger(): Promise<BlockchainRecord[]> {
       address: CONTRACT_ADDRESS,
       event: ORDER_EVENT_ABI[0],
       fromBlock: fromBlock,
-      toBlock: 'latest' 
+      toBlock: currentBlock 
     });
     console.log(`[BC] Raw logs found: ${logs.length}`);
 
