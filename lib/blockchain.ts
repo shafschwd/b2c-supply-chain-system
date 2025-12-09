@@ -116,7 +116,7 @@ export async function recordEventOnChain(
     });
 
     // Wait for the transaction to be mined
-    await publicClient.waitForTransactionReceipt({ hash });
+    await publicClient.waitForTransactionReceipt({ hash, timeout: 120000 }); // Wait up to 2 minutes
 
     console.log(
       `[BC] Recorded event ${eventType} for ID ${uniqueId}. TX Hash: ${hash}`
