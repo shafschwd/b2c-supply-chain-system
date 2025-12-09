@@ -1,65 +1,135 @@
-# b2c-supply-chain-system
+# B2C Supply Chain System
 
-This repository contains a demo blockchain-enabled B2C supply chain system built with Next.js, Hardhat, Viem/Ethers integration, and PostgreSQL client placeholders.
+A blockchain-enabled supply chain tracking system where buyers, sellers, and logistics providers can interact transparently.
+Built with **Next.js 14**, **Hardhat (Ethereum/Solidity)**, and **PostgreSQL**.
 
-Quick start
+---
 
-1. Install dependencies:
+## 🚀 Quick Start Guide
 
-```powershell
+Follow these steps to get the project running on your local machine.
+
+### 1. Prerequisites
+Ensure you have the following installed:
+- **Node.js** (v18 or later)
+- **Git**
+- **PostgreSQL** (v14 or later)
+
+### 2. Clone the Repository
+```bash
+git clone https://github.com/your-username/b2c-supply-chain-system.git
+cd b2c-supply-chain-system
+```
+
+### 3. Install Dependencies
+```bash
 npm install
 ```
 
-2. Compile contracts and run local dev server (Hardhat + Next):
+---
 
-```powershell
-npx hardhat compile
-npm run dev
-```
+## 🛠️ Setup Database (PostgreSQL)
 
-3. To deploy locally with Hardhat:
+You need a local PostgreSQL database running.
 
-```powershell
-npx hardhat run scripts/deploy.ts --network hardhat
-```
+1. **Start PostgreSQL Service**:
+   ```bash
+   # MacOS (Homebrew)
+   brew services start postgresql@14
+   # OR just run the app if installed globally
+   ```
 
-Notes
+2. **Create the Database Application User**:
+   Run this command in your terminal to create a database and a dedicated user:
+   ```bash
+   createdb supply_chain_db
+   createuser -s scm_user
+   ```
+   *Note: If you have different credentials, update them in `.env` later.*
 
-- Add your database and blockchain configuration in `hardhat.config.ts` and `.env` as needed.
-- The project uses `viem` in some scripts; the deploy script falls back to `hre.ethers` if Viem is not available.
-  This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+3. **Initialize the Schema**:
+   Run the provided setup script to create tables (users, orders, items, shipments):
+   ```bash
+   psql -d supply_chain_db -f scripts/setup_db.sql
+   ```
 
-## Getting Started
+4. **Configure Environment Variables**:
+   Create a `.env` file in the root directory:
+   ```bash
+   cp .env.example .env
+   # OR create it manually:
+   touch .env
+   ```
+   Add the following content to `.env`:
+   ```env
+   # Database Configuration
+   DB_USER=scm_user
+   DB_PASSWORD=123456
+   DB_HOST=localhost
+   DB_NAME=supply_chain_db
+   DB_PORT=5432
+   ```
 
-First, run the development server:
+---
 
+## ⛓️ Setup Blockchain (Hardhat Local Node)
+
+To simulate the blockchain locally, you need to run a dedicated node.
+
+1. **Open a New Terminal Window** (Terminal A) and run:
+   ```bash
+   npx hardhat node
+   ```
+   *Keep this terminal open! This is your local blockchain running on `http://127.0.0.1:8545`.*
+
+2. **Deploy the Smart Contract**:
+   Open a **second terminal** (Terminal B) and run:
+   ```bash
+   npx hardhat run scripts/deploy.ts --network localhost
+   ```
+
+3. **IMPORTANT: Update Contract Address**:
+   After deployment, the terminal will show a message like:
+   > OrderTracker deployed to: 0x5FbDB2315678afec8c3562b921AA65B2eB42d14A
+
+   Copy this address and update the file **`lib/blockchain.ts`**:
+   ```typescript
+   // lib/blockchain.ts
+   const CONTRACT_ADDRESS: Address = getAddress('0x5FbDB2315678afec8c3562b921AA65B2eB42d14A');
+   ```
+
+---
+
+## 🏃 Run the Application
+
+Now that the Database and Blockchain are running, start the web app.
+
+In your terminal (Terminal B):
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🧪 Testing the Flow
 
-## Learn More
+1. **Sign Up a Buyer**: Create an account (e.g., "Buyer One").
+2. **Sign Up a Seller**: Create a second account (incognito window) with role "Seller".
+3. **Sign Up Logistics**: Create a third account with role "Logistics Provider".
+   * *Required for shipment updates to work!*
+4. **Create an Order**: As a Buyer, select an item and buy it.
+5. **Simulate Flow**:
+   - Seller logs in -> "Accept Order".
+   - Logistics logs in -> Update Location -> "Out for Delivery".
+   - Buyer logs in -> "Confirm Receipt".
 
-To learn more about Next.js, take a look at the following resources:
+## 🐛 Troubleshooting
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Error: `ECONNREFUSED 127.0.0.1:8545`**
+  - Your Hardhat node is not running. Run `npx hardhat node`.
+- **Error: `InvalidAddressError`**
+  - You probably restarted the Hardhat node but didn't update the `CONTRACT_ADDRESS` in `lib/blockchain.ts`. Redeploy and update it.
+- **Error: ForeignKey Violation (Logistics)**
+  - You forgot to create a user with the "Logistics Provider" role. The system needs at least one to assign shipments to.
