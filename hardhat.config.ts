@@ -1,6 +1,7 @@
 // /hardhat.config.ts - TOOLBOX VIEM SETUP
 
 import { HardhatUserConfig } from 'hardhat/config';
+import 'dotenv/config'; // Load env vars
 import toolbox from '@nomicfoundation/hardhat-toolbox-viem';
 
 const config: HardhatUserConfig = {
