@@ -9,6 +9,7 @@ const connectionConfig = {
   host: process.env.DB_HOST || 'localhost',
   database: process.env.DB_NAME || 'supply_chain_db',
   port: parseInt(process.env.DB_PORT || '5432'),
+  ssl: process.env.DB_HOST && process.env.DB_HOST !== 'localhost' ? { rejectUnauthorized: false } : false,
 };
 
 // Create a connection pool to manage multiple connections efficiently
