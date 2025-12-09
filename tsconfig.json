@@ -21,7 +21,7 @@
     "paths": {
       "@/*": ["./*"]
     },
-    "types": ["node", "hardhat"]
+    "types": ["node", "hardhat", "@nomicfoundation/hardhat-viem"]
   },
   "include": [
     "next-env.d.ts",

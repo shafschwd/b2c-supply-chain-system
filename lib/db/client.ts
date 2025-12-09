@@ -4,11 +4,11 @@ import { Pool } from 'pg';
 
 // Database connection details
 const connectionConfig = {
-  user: 'scm_user',
-  password: '123456', // The password you specified
-  host: 'localhost', // Assuming PostgreSQL is running locally (default)
-  database: 'supply_chain_db',
-  port: 5432, // Default PostgreSQL port
+  user: process.env.DB_USER || 'scm_user',
+  password: process.env.DB_PASSWORD || '123456',
+  host: process.env.DB_HOST || 'localhost',
+  database: process.env.DB_NAME || 'supply_chain_db',
+  port: parseInt(process.env.DB_PORT || '5432'),
 };
 
 // Create a connection pool to manage multiple connections efficiently
