@@ -104,7 +104,7 @@ export async function collectPaymentTransaction(
   }
   if (
     order.current_status !== OrderStatus.DELIVERED &&
-    order.current_status !== OrderStatus.COMPLETED
+    order.current_status !== OrderStatus.CONFIRMED
   ) {
     throw new Error('Cannot collect payment: Order not delivered/confirmed.');
   }
