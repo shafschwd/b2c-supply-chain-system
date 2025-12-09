@@ -11,7 +11,7 @@ import {
   WalletClient,
   Address,
 } from 'viem';
-import { hardhat } from 'viem/chains';
+import { hardhat, sepolia } from 'viem/chains';
 import { privateKeyToAccount } from 'viem/accounts';
 import { BlockchainRecord } from '@/types/blockchain';
 
@@ -36,23 +36,33 @@ import { getAddress } from 'viem';
 // --- CONFIGURATION ---
 // You MUST update this address after the initial deployment (see Step 2)
 const CONTRACT_ADDRESS: Address = getAddress((process.env.NEXT_PUBLIC_CONTRACT_ADDRESS as string) || '0x5fbdb2315678afecb367f032d93f642f64180aa3');
-// This key manages the application's interaction with the blockchain (Option A)
-const DEPLOYER_PRIVATE_KEY = (process.env.PRIVATE_KEY as Hex) || '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'; // Fallback to Hardhat default for local dev
+
+// Helper to ensure private key has 0x prefix
+const formatPrivateKey = (key: string | undefined): Hex => {
+  if (!key) return '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80';
+  if (key.startsWith('0x')) return key as Hex;
+  return `0x${key}` as Hex;
+};
+
+const DEPLOYER_PRIVATE_KEY = formatPrivateKey(process.env.PRIVATE_KEY);
+
+// Determine Chain
+const CURRENT_CHAIN = process.env.NEXT_PUBLIC_BLOCKCHAIN_NETWORK === 'sepolia' ? sepolia : hardhat;
 
 // --- CLIENTS ---
 const account = privateKeyToAccount(DEPLOYER_PRIVATE_KEY);
 
 // Public Client (for reading/fetching events)
 const publicClient: PublicClient = createPublicClient({
-  chain: hardhat,
-  transport: http(), // Defaults to localhost:8545
+  chain: CURRENT_CHAIN,
+  transport: http(process.env.SEPOLIA_RPC_URL), 
 });
 
 // Wallet Client (for writing/sending transactions)
 const walletClient: WalletClient = createWalletClient({
   account,
-  chain: hardhat,
-  transport: http(),
+  chain: CURRENT_CHAIN,
+  transport: http(process.env.SEPOLIA_RPC_URL),
 });
 
 // The ABI for the OrderEvent (must match the event in OrderTracker.sol)
