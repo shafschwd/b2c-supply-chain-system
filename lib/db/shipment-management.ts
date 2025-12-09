@@ -71,7 +71,7 @@ export async function updateShipmentLocationTransaction(
         txHash,
         orderId,
         OrderStatus.DELIVERED,
-        OrderStatus.COMPLETED,
+        OrderStatus.CONFIRMED,
         OrderStatus.CANCELLED,
       ]
     );
